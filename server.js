@@ -59,7 +59,7 @@ wss.on('connection', (ws, req) => {
 
 async function handleEphemeralKey(ws) {
     try {
-        const response = await fetch('https://api.openai.com/v1/realtime/sessions', {
+        /*const response = await fetch('https://api.openai.com/v1/realtime/sessions', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
@@ -69,7 +69,19 @@ async function handleEphemeralKey(ws) {
                 model: "gpt-4o-realtime-preview-2024-12-17",
                 voice: "alloy"
             })
-        });
+        });*/
+		const response = await fetch('https://api.openai.com/v1/realtime', { 
+		  method: 'POST',
+		  headers: {
+			'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+			'Content-Type': 'application/json',
+			'OpenAI-Beta': 'realtime=v1' 
+		  },
+		  body: JSON.stringify({
+			model: "gpt-4o-realtime-preview-2024-12-17",
+			voice: "alloy"
+		  })
+		});
         
         const data = await response.json();
 		console.log('Ephemeral key : ', data)
