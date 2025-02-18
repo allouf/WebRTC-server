@@ -9,7 +9,7 @@ const app = express();
 const server = http.createServer(app); 
 const wss = new WebSocket.Server({ server });
 
-const PORT = process.env.PORT || 3000; // Use Vercel's PORT or default to 3000 for local testing
+const port = process.env.PORT || 8080; // Railway injects PORT
 
 const peers = new Map(); 
 
@@ -178,6 +178,6 @@ app.get('/', (req, res) => {
     res.send('<h1>Hello, World!</h1>'); // Respond with a simple HTML message
 });
 
-server.listen(PORT, async () => { 
-    console.log(`Signaling server running on port ${PORT}`); 
+server.listen(port, "0.0.0.0", () => {
+    console.log(`Server running on port ${port}`);
 });
