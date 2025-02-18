@@ -20,7 +20,7 @@ app.use((req, res, next) => {
 });
 
 wss.on('connection', (ws, req) => {
-    console.log('Client connected');
+    
 	console.log('Client connected from IP req:', req.socket.remoteAddress);
 	console.log('Client connected from IP address:', ws._socket.remoteAddress);
 
@@ -59,6 +59,7 @@ wss.on('connection', (ws, req) => {
 
 async function handleEphemeralKey(ws) {
     try {
+		console.log('handle Ephemeral Key');
         /*const response = await fetch('https://api.openai.com/v1/realtime/sessions', {
             method: 'POST',
             headers: {
