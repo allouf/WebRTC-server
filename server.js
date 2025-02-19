@@ -20,6 +20,7 @@ app.use((req, res, next) => {
 });
 
 app.post('/get-ephemeral-key', async (req, res) => {
+    console.log("Received request for ephemeral key");
     try {
         const response = await fetch('https://api.openai.com/v1/realtime/sessions', {
             method: 'POST',
@@ -34,9 +35,15 @@ app.post('/get-ephemeral-key', async (req, res) => {
             })
         });
         
+        if (!response.ok) {
+            console.error("Error fetching from OpenAI:", response.status, response.statusText);
+            return res.status(response.status).json({ error: "Failed to fetch from OpenAI" });
+        }
+
         const data = await response.json();
         res.json({ key: data.client_secret.value });
     } catch (error) {
+        console.error("Error in /get-ephemeral-key:", error);
         res.status(500).json({ error: error.message });
     }
 });
