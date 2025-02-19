@@ -11,7 +11,17 @@ const wss = new WebSocket.Server({ server });
 
 const port = process.env.PORT || 8080; // Railway injects PORT
 
-const peers = new Map(); 
+const peers = new Map();
+
+const cors = require('cors');
+app.use(cors({
+  origin: '*',
+  methods: ['POST', 'GET'],
+  allowedHeaders: ['Content-Type']
+}));
+
+// Add OPTIONS handler
+app.options('*', cors()); 
 
 app.use(express.json()); 
 app.use((req, res, next) => { 
@@ -20,31 +30,40 @@ app.use((req, res, next) => {
 });
 
 app.post('/get-ephemeral-key', async (req, res) => {
-    console.log("Received request for ephemeral key");
     try {
+        console.log("Request body:", req.body); // Add logging
         const response = await fetch('https://api.openai.com/v1/realtime/sessions', {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-                'Content-Type': 'application/json'
+                "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
+                "Content-Type": "application/json"
             },
             body: JSON.stringify({
                 model: "gpt-4o-realtime-preview-2024-12-17",
                 voice: "alloy",
-                instructions: "You are a helpful assistant"
+                instructions: "You are a helpful assistant",
+                input_audio_transcription: { model: "whisper-1" }
             })
         });
-        
-        if (!response.ok) {
-            console.error("Error fetching from OpenAI:", response.status, response.statusText);
-            return res.status(response.status).json({ error: "Failed to fetch from OpenAI" });
-        }
 
         const data = await response.json();
-        res.json({ key: data.client_secret.value });
+        console.log("OpenAI response:", data);
+        
+        if (!data?.client_secret?.value) {
+            throw new Error('Invalid response from OpenAI');
+        }
+        
+        res.json({ 
+            key: data.client_secret.value,
+            expires_at: data.client_secret.expires_at
+        });
+
     } catch (error) {
-        console.error("Error in /get-ephemeral-key:", error);
-        res.status(500).json({ error: error.message });
+        console.error("Full error:", error);
+        res.status(500).json({ 
+            error: error.message,
+            stack: error.stack
+        });
     }
 });
 
