@@ -10,6 +10,7 @@ const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
 const port = process.env.PORT || 8080; // Railway injects PORT
+const OPENAI_MODEL = "gpt-4o-realtime-preview-2025-06-03"; // Updated model version
 
 const peers = new Map();
 
@@ -39,7 +40,7 @@ app.post('/get-ephemeral-key', async (req, res) => {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                model: "gpt-4o-realtime-preview-2024-12-17",
+                model: OPENAI_MODEL,
                 voice: "alloy",
                 instructions: "You are a helpful assistant",
                 input_audio_transcription: { model: "whisper-1" }
